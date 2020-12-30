@@ -1,0 +1,365 @@
+type: edu
+custom_name: stage5
+files:
+- name: src/converter/Main.kt
+  visible: true
+  text: |
+    package converter
+
+    fun main() {
+        println("Hello, World!")
+    }
+  learner_created: false
+- name: test/WordComparer.kt
+  visible: false
+  text: "import org.hyperskill.hstest.testcase.CheckResult\nimport java.util.*\nimport\
+    \ kotlin.math.max\nimport kotlin.math.min\n\nclass InputToken(\n        val content:\
+    \ Any,\n        /** Position in range.*/\n        val range: IntRange\n) {\n \
+    \   override fun equals(other: Any?): Boolean {\n        if (this === other) return\
+    \ true\n        if (javaClass != other?.javaClass) return false\n\n        other\
+    \ as InputToken\n\n        if (content != other.content) return false\n\n    \
+    \    return true\n    }\n\n    override fun hashCode(): Int {\n        return\
+    \ content.hashCode()\n    }\n\n    override fun toString() =\n            if (content::class.simpleName\
+    \ == \"String\") \"$content\"\n            else \"$content(${content::class.simpleName})\"\
+    \n}\n\n/**Compares two output strings by words (splitted by spaces, commas etc).\n\
+    \ * Numbers in different formats are parsed equally.\n * Doubles are compared\
+    \ with [roundDoubleTo] precision.\n * All integer numbers should fit to long or\
+    \ they will be compared as strings.\n *\n * Run [compare] function to compare.\n\
+    \ * @param myStr authors output string.\n * @param hisStr  students output string.\n\
+    \ * @param roundDoubleTo number of digits after the dot to compare doubles.\n\
+    \ * @param integersAsDoubles Doubles such as 1.0 are now equal to integers.\n\
+    \ * @param trimErrorOnlyByLine if true, ignore [errorContextStd] and trim the\
+    \ error by \\n\n * @param errorContextStd number of words in [myStr] and [hisStr]\
+    \ before and after the error word.\n * @param moreIgnoredSymbolsRegex add some\
+    \ symbols in regex notation to ignore. For example: \"\\.,\" - will ignore dot\
+    \ or comma. */\nclass WordComparer(\n        val myStr: String,\n        val hisStr:\
+    \ String,\n        val roundDoubleTo: Int = 2,\n        val integersAsDoubles:\
+    \ Boolean = false,\n        val trimErrorOnlyByLine: Boolean = true,\n       \
+    \ val errorContextStd: Int = 1,\n        val moreIgnoredSymbolsRegex: String =\
+    \ \"\"\n) {\n    /** Parse either double, long, word. */\n\n    private val wordRegex\
+    \ = Regex(\"\"\"([+-]?\\d+\\.\\d+([eE][+-]\\d+)?)|([+-]?\\d+)|([^\\s\\d $moreIgnoredSymbolsRegex]+)\"\
+    \"\")\n\n    private fun tokenizeWordsRegex(str: String): List<InputToken> {\n\
+    \        return wordRegex.findAll(str)\n                .map { match ->\n    \
+    \                val (_, double, _, long, word) = match.groups.map { it?.value\
+    \ }\n\n                    val content: Any = when {\n                       \
+    \ long?.toLongOrNull() != null ->\n                            if (integersAsDoubles)\
+    \ long.toDouble() else long.toLong()\n\n                        double?.toDoubleOrNull()\
+    \ != null -> {\n                            // Locale.US puts a dot separator\n\
+    \                            \"%.${roundDoubleTo}f\".format(Locale.US, double.toDouble()).toDouble()\n\
+    \                        }\n\n                        else -> match.value\n  \
+    \                  }\n                    InputToken(content, match.range)\n \
+    \               }.toList()\n    }\n\n\n    fun compare(): CheckResult {\n    \
+    \    // I am author\n        val myTokens = tokenizeWordsRegex(myStr.toLowerCase())\n\
+    \        val hisTokens = tokenizeWordsRegex(hisStr.toLowerCase())\n\n        val\
+    \ badTokenIdx = myTokens.zip(hisTokens).indexOfFirst { (my, his) -> my != his\
+    \ }\n\n        if (badTokenIdx != -1) {\n            fun substr(tokens: List<InputToken>,\
+    \ input: String): String {\n                if (trimErrorOnlyByLine) {\n     \
+    \               // trim by \\n\n                    val badToken = tokens[badTokenIdx]\n\
+    \                    val start = input.take(badToken.range.start).lastIndexOf('\\\
+    n').let { if (it == -1) 0 else it + 1 }\n                    val end = input.indexOf('\\\
+    n', badToken.range.endInclusive).let { if (it == -1) input.length else it }\n\
+    \                    return input.substring(start, end).trimEnd('\\r')\n     \
+    \           }\n                // trim by nearest tokens\n                val\
+    \ std = errorContextStd\n                val subTokens = tokens.subList(max(badTokenIdx\
+    \ - std, 0), min(badTokenIdx + std + 1, tokens.size))\n                val strStart\
+    \ = subTokens.first().range.start\n                val strEnd = subTokens.last().range.endInclusive\
+    \ + 1\n                return input.substring(strStart, strEnd)\n            }\n\
+    \n            val myContext = substr(myTokens, myStr)\n            val hisContext\
+    \ = substr(hisTokens, hisStr)\n            if (trimErrorOnlyByLine) {\n      \
+    \          val hisBadToken = hisTokens[badTokenIdx]\n                val myBadToken\
+    \ = myTokens[badTokenIdx]\n                return CheckResult(false, \"Your line\
+    \ \\\"$hisContext\\\"\\n\" +\n                        \"doesn't match with \\\"\
+    $myContext\\\"\\n\" +\n                        \"in parts \\\"${hisBadToken.content}\\\
+    \" and \\\"${myBadToken.content}\\\".\")\n            }\n            return CheckResult(false,\
+    \ \"Your output ...$hisContext... doesn't match with ...$myContext...\")\n   \
+    \     }\n    \n        // check unequal size after other mistakes.\n        if\
+    \ (hisTokens.size < myTokens.size) {\n            return CheckResult(false, \"\
+    Your output is too short. \" +\n                    \"It contains only ${hisTokens.size}\
+    \ words, but should contain ${myTokens.size} words.\")\n        }\n        if\
+    \ (hisTokens.size > myTokens.size) {\n            return CheckResult(false, \"\
+    Your output is too long. \" +\n                    \"It contains ${hisTokens.size\
+    \ - myTokens.size} extra words.\")\n        }\n        return CheckResult.correct()\n\
+    \    }\n}\n"
+  learner_created: false
+- name: test/TestCaseHelpers.kt
+  visible: false
+  text: |+
+    import org.hyperskill.hstest.testcase.CheckResult
+    import org.hyperskill.hstest.testcase.TestCase
+    import java.io.ByteArrayOutputStream
+    import java.io.PrintStream
+    import java.util.*
+
+    /** Output based clue. */
+    data class OutputClue(
+            val output: String,
+            /** Do not show correct output and input. */
+            var isPrivate: Boolean = false,
+            /** Optionally you can add the console input. */
+            val input: String? = null
+    )
+
+    /** Default testCase. */
+    fun <T> testCase(attach: T, input: String) = TestCase<T>().apply {
+        setInput(input)
+        setAttach(attach)
+    }
+
+    /** [OutputClue] based testCase. Doesn't mean that lines will be compared by letters!!!*/
+    fun outputCase(input: String, output: String, isPrivate: Boolean = false) =
+            testCase(OutputClue(output, isPrivate, input), input)
+
+
+    /** TestCase, based on authors solution output. */
+    fun authorsCaseFromFun(
+            mainMethod: (Scanner, PrintStream) -> Unit,
+            input: String,
+            isPrivate: Boolean = false
+    ): TestCase<OutputClue> {
+
+        val authorsBytes = ByteArrayOutputStream()
+        mainMethod(Scanner(input), PrintStream(authorsBytes, true))
+        val authors = authorsBytes.toString()
+
+        return testCase(OutputClue(authors, isPrivate, input), input)
+    }
+
+    fun TestCase<OutputClue>.private() = this.apply { attach.isPrivate = true }
+
+    /** Hide error description in private test. */
+    fun CheckResult.ciphered() =
+            if (!isCorrect)
+                CheckResult(false)
+            else CheckResult(true, feedback)
+
+  learner_created: false
+- name: test/ConverterTest.java
+  visible: false
+  text: |
+    import converter.MainKt;
+    import org.hyperskill.hstest.stage.StageTest;
+
+
+    abstract public class ConverterTest<T> extends StageTest<T> {
+        public ConverterTest() {
+            super(MainKt.class);
+        }
+    }
+  learner_created: false
+- name: test/Authors.kt
+  visible: false
+  text: |
+    import MeasureType.*
+    import java.io.*
+    import java.util.*
+
+
+    enum class MeasureType {
+        Length, Weight, Temperature;
+
+        fun of(short: String,
+               normal: String,
+               plural: String,
+               multiplier: Double,
+               shift: Double = 0.0,
+               vararg otherNames: String) = Measure(this, short, normal, plural, multiplier, shift, *otherNames)
+    }
+
+    class Measure(
+            val type: MeasureType,
+            val short: String,
+            val normal: String,
+            val plural: String,
+            val multiplier: Double,
+            val shift: Double = 0.0,
+            vararg val otherNames: String
+    ) {
+        fun name(amount: Double) = if (amount == 1.0) normal else plural
+
+        val allNames get() = listOf(short, normal, plural, *otherNames)
+    }
+
+    val measures = listOf(
+            Length.of("m", "meter", "meters", 1.0),
+            Length.of("km", "kilometer", "kilometers", 1000.0), // one km is 1000.0 * 1 m
+            Length.of("cm", "centimeter", "centimeters", 0.01),
+            Length.of("mm", "millimeter", "millimeters", 0.001),
+            Length.of("mi", "mile", "miles", 1609.35),
+            Length.of("yd", "yard", "yards", 0.9144),
+            Length.of("ft", "foot", "feet", 0.3048),
+            Length.of("in", "inch", "inches", 0.0254),
+
+            Weight.of("g", "gram", "grams", 1.0),
+            Weight.of("kg", "kilogram", "kilograms", 1000.0),
+            Weight.of("mg", "milligram", "milligrams", 0.001),
+            Weight.of("lb", "pound", "pounds", 453.592),
+            Weight.of("oz", "ounce", "ounces", 28.3495),
+
+            Temperature.of("c", "degree Celsius", "degrees Celsius", 1.0, 0.0, "dc", "celsius"),
+            Temperature.of("f", "degree Fahrenheit", "degrees Fahrenheit", 5 / 9.0, -32.0 * 5 / 9.0, "df", "fahrenheit"), // one df is (1 -32)* 5/9 dc
+            Temperature.of("k", "kelvin", "kelvins", 1.0, -273.15) // one Kelvin is 1*1.0 - 273.15 dc
+    )
+
+    // we use lowercase names in map, but original names are not.
+    val namesToMeasures = measures
+            .flatMap { m ->
+                m.allNames.map { name -> name.toLowerCase() to m }
+            }.toMap()
+
+
+    fun solveAuthors(sin: Scanner, sout: PrintStream) {
+        while (true) {
+            sout.print("Enter what you want to convert (or exit): ")
+            val valueStr = sin.next()
+            if (valueStr == "exit") {
+                break
+            }
+
+            val value = valueStr.toDouble()
+
+            // read measures:
+            fun readMeasure(): String {
+                var word = sin.next()
+                if (word.toLowerCase() == "degree" || word.toLowerCase() == "degrees") {
+                    word += " " + sin.next()
+                }
+                return word
+            }
+
+            val m1Str = readMeasure()
+
+            sin.next() // unknown word like to or in
+            val m2Str = readMeasure()
+
+            val m1 = namesToMeasures[m1Str.toLowerCase()]
+            val m2 = namesToMeasures[m2Str.toLowerCase()]
+
+            // error handlers:
+            if (m1 == null || m2 == null) {
+                sout.println("Conversion from ${m1?.plural ?: "???"} to ${m2?.plural ?: "???"} is impossible")
+                continue
+            }
+            if (m1.type != m2.type) {
+                sout.println("Conversion from ${m1.plural} to ${m2.plural} is impossible")
+                continue
+            }
+            if (m1.type != Temperature && value < 0.0) {
+                sout.println("${m1.type.name} shouldn't be negative.")
+                continue
+            }
+
+            // a measure with 1.0 multiplier and 0.0 shift
+            val standard = value * m1.multiplier + m1.shift
+            val converted = (standard - m2.shift) / m2.multiplier
+
+            sout.println("$value ${m1.name(value)} is $converted ${m2.name(converted)}")
+        }
+    }
+
+
+    fun main(args: Array<String>) {
+        solveAuthors(Scanner(System.`in`), System.out)
+    }
+  learner_created: false
+- name: test/Task5Test.kt
+  visible: false
+  text: |
+    import org.hyperskill.hstest.testcase.CheckResult
+    import org.hyperskill.hstest.testcase.TestCase
+
+
+    /** TestCase, based on authors solution output. */
+    fun authorsCase(input: String, isPrivate: Boolean = false) =
+            authorsCaseFromFun(::solveAuthors, input, isPrivate)
+
+    class Task5Test : ConverterTest<OutputClue>() {
+
+        override fun generate(): List<TestCase<OutputClue>> {
+            val l1 = listOf(
+                    // tests from the example
+                    authorsCase("1 degree Celsius to kelvins\n" +
+                            "-272.15 dc to K\n" +
+                            "1 kn to feet\n" +
+                            "1 km to feet\n" +
+                            "3 pount to ounces\n" +
+                            "3 pound to ounces\n" +
+                            "3 kelvins to grams\n" +
+                            "3 grams to meters\n" +
+                            "exit\n"),
+                    authorsCase("1 F in K\n" +
+                            "1 K in F\n" +
+                            "1 C in K\n" +
+                            "1 K in C\n" +
+                            "1 F in C\n" +
+                            "1 C in F\n" +
+                            "exit\n"),
+
+                    // my tests.
+
+                    // errors
+                    // unknown
+                    authorsCase("100 AAA convertTo BBB\nexit"),
+                    authorsCase("-100.0 X to Y\nexit", true),
+                    authorsCase("-100.0 kelvin to Y\nexit"),
+                    authorsCase("-100.0 X to kelvin\nexit", true),
+                    authorsCase("100.0 X to Pound\nexit", true),
+                    // negative unsupported
+                    authorsCase("-100.1 cm to M\nexit"),
+                    authorsCase("-10.10 Kilometer to mm\nexit", true),
+                    authorsCase("-100.1 Gram to kg\nexit"),
+                    authorsCase("-100.1 mg to g\nexit", true),
+                    // incomparable
+                    authorsCase("1 Pound to degrees Celsius\nexit"),
+                    authorsCase("1 cm to kelvin\nexit", true),
+                    authorsCase("1 k to mm\nexit", true),
+                    authorsCase("1 g to df\nexit", true),
+                    authorsCase("1 degrees celsius to Grams\nexit"),
+                    authorsCase("1 Grams to degree Fahrenheit\nexit", true),
+
+                    // two word names
+                    authorsCase("1 degree XX to degrees YY\nexit"),
+                    authorsCase("1 degrees XX to degree YY\nexit", true),
+                    authorsCase("12 degree Celsius to degrees nnn\nexit", true),
+                    authorsCase("15 DEGREES CELSIUS in DEGREE FAHRENHEIT\nexit"),
+                    authorsCase("12 DEGREE xxx to degrees Fahrenheit\nexit"),
+                    authorsCase("15 DEGREE CELsius in Degrees CELsius\nexit", true),
+                    authorsCase("15 DEGREE CELsius in mm\nexit", true),
+                    authorsCase("17 celsius in fahrenheit\nexit") // another short names.
+            )
+
+            val temps = listOf(
+                    "kelvins", "kelvin", "k",
+                    "degrees celsius", "degree celsius", "celsius", "dc", "c",
+                    "degrees fahrenheit", "degree fahrenheit", "fahrenheit", "df", "f",
+                    "XX", "yard" // plus some noise.
+            )
+            val lastTest = temps
+                    // all combinations
+                    .flatMap { t1 -> temps.map { t2 -> t1 to t2 } }
+                    .mapIndexed { i, (t1, t2) ->
+                        "${i + 1} $t1 in $t2"
+                    }
+                    .joinToString("\n", postfix = "\nexit")
+                    .let { authorsCase(it, true) }
+
+            return l1 + lastTest
+        }
+
+        override fun check(reply: String, clue: OutputClue): CheckResult {
+            // compare the clue output and reply with our custom comparer.
+    //        println("Input: ${clue.input}")
+            val checkResult = WordComparer(
+                    clue.output,
+                    reply,
+                    moreIgnoredSymbolsRegex = """\."""
+            ).compare()
+
+            if (clue.isPrivate)
+                return checkResult.ciphered()
+            return checkResult
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/projects/70/stages/389/implement#comment
+status: Unchecked
+record: -1

@@ -1,0 +1,155 @@
+# Created by .ignore support plugin (hsz.mobi)
+### JetBrains template
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Generated files
+.idea/**/contentModel.xml
+
+# Sensitive or high-churn files
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
+# .idea/modules.xml
+# .idea/*.iml
+# .idea/modules
+# *.iml
+# *.ipr
+
+# CMake
+cmake-build-*/
+
+# Mongo Explorer plugin
+.idea/**/mongoSettings.xml
+
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Cursive Clojure plugin
+.idea/replstate.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Editor-based Rest Client
+.idea/httpRequests
+
+# Android studio 3.1+ serialized cache file
+.idea/caches/build_file_checksums.ser
+
+### Kotlin template
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+Cinema Room Manager/task/build/
+build-history.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/counters.tab
+/Cinema Room Manager/task/build/test-results/test/TEST-CinemaTests.xml
+/.gradle/6.6.1/javaCompile/jarAnalysis.bin
+/Cinema Room Manager/task/build/test-results/test/binary/results.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+/.gradle/6.6.1/javaCompile/classAnalysis.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.keystream.len
+/Cinema Room Manager/task/build/kotlin/compileKotlin/last-build.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/package-parts.tab
+/.gradle/6.6.1/fileHashes/fileHashes.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab
+/.gradle/6.6.1/fileHashes/resourceHashesCache.bin
+/Cinema Room Manager/task/build/kotlin/compileTestKotlin/build-history.bin
+/.gradle/checksums/checksums.lock
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab.keystream.len
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/proto.tab.values.at
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+/.gradle/6.6.1/executionHistory/executionHistory.lock
+/Cinema Room Manager/task/build/kotlin/compileTestKotlin/last-build.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.keystream
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab_i
+/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+/.gradle/6.6.1/javaCompile/taskHistory.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.len
+/Cinema Room Manager/task/build/test-results/test/binary/output.bin
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab.values.at
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/file-to-id.tab.values.at
+/.gradle/checksums/sha1-checksums.bin
+/.gradle/buildOutputCleanup/outputFiles.bin
+/Cinema Room Manager/task/build/reports/tests/test/classes/CinemaTests.html
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab.len
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/lookups.tab.values.at
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/source-to-classes.tab
+/Cinema Room Manager/task/build/reports/tests/test/packages/default-package.html
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab.keystream
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/id-to-file.tab_i
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+/.gradle/6.6.1/executionHistory/executionHistory.bin
+/.idea/frameworkLessonHistory/storage.storageRecordIndex
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/inputs/source-to-output.tab.values.at
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/lookups/file-to-id.tab
+/.gradle/6.6.1/javaCompile/javaCompile.lock
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/package-parts.tab.values.at
+/Cinema Room Manager/task/build/test-results/test/binary/output.bin.idx
+/.gradle/6.6.1/fileHashes/fileHashes.lock
+/Cinema Room Manager/task/build/reports/tests/test/index.html
+/Cinema Room Manager/task/build/kotlin/compileKotlin/caches-jvm/jvm/kotlin/proto.tab
+/.idea/frameworkLessonHistory/storage.storageData
+/.idea/vcs.xml
+/.gradle/buildOutputCleanup

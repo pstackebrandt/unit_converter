@@ -1,0 +1,117 @@
+<h2>Description</h2>
+
+<p>Our converter is really capable now, but there's still one thing it's missing: it can't work with temperature units. Let's extend the program by adding three units of temperature. </p>
+
+<p>The main units of temperature used today are degrees Celsius (C), degrees Fahrenheit (F), and Kelvins (K). The program should allow the following notations:</p>
+
+<ul>
+	<li>For degrees <strong>Celsius</strong>, the user can input "degree Celsius", "degrees Celsius", "celsius", "dc", or "c".</li>
+	<li>For degrees <strong>Fahrenheit</strong>, the user can input "degree Fahrenheit", "degrees Fahrenheit", "fahrenheit", "df", or "f".</li>
+	<li>For <strong>Kelvins</strong>, the user can input "kelvin", "kelvins", or "k".</li>
+</ul>
+
+<p>Note that converting units of temperature is different from working with length or weight. The problem is that 0 kelvin is not equal to 0 degrees Celsius or 0 degrees Fahrenheit, and neither is 0 degrees Celsius equal to 0 degrees Fahrenheit. This means that our conversion process will differ.</p>
+
+<p>Let's consider the formulae for converting one unit of temperature to another.</p>
+
+<p>1) Celsius to Fahrenheit or vice versa:</p>
+
+<p><span class="math-tex">\(C = (F - 32) * {5 \over 9}\)</span></p>
+
+<p><span class="math-tex">\(F = C * {9 \over5} + 32\)</span></p>
+
+<p>2) Kelvins to Celsius or vice versa:</p>
+
+<p><span class="math-tex">\(K = C + 273.15\)</span></p>
+
+<p><span class="math-tex">\(C = K - 273.15\)</span></p>
+
+<p>3) Fahrenheit to Kelvins and vice versa:</p>
+
+<p><span class="math-tex">\(F = K * {9 \over 5} - 459.67\)</span></p>
+
+<p><span class="math-tex">\(K = (F + 459.67) * {5 \over 9}\)</span></p>
+
+<p>Try to rewrite your program using enums. The problem with representing measurement units as strings is that strings may take longer to process, especially since each unit has at least three different accepted string notations (such as “m”, “meter”, and “meters”).<br>
+If you represent each unit by a special enum value, your code becomes cleaner and more readable. Since comparing enum values is much faster than comparing strings, your code is also processed faster.</p>
+
+<p>If the user wants to convert weight or length from one unit to another and inputs a negative amount, print <code class="java">Weight shouldn't be negative</code> or <code class="java">Length shouldn't be negative</code>, respectively. </p>
+
+<p>If a query is bad, we should also handle this. Try to parse the following parts:</p>
+
+<pre><code class="java">&lt;number&gt; +
+&lt;(unit name) or (degree + unit name) or (degrees + unit name)&gt; +
+&lt;random word like "to" or "in"&gt; +
+&lt;(unit name) or (degree + unit name) or (degrees + unit name)&gt;
+</code></pre>
+
+<p>If there is an error, output <code class="java">Parse error</code>.</p>
+
+<h2>Objectives</h2>
+
+<ol>
+	<li>Rewrite your program using enums.</li>
+	<li>Your program should be able to convert values from any unit of length, weight, or temperature, to any other unit.</li>
+	<li>The user input remains case insensitive. </li>
+	<li>Your program should be able to handle all the possible error types. In the error message, both measurement types should be written in plural, not singular.</li>
+	<li>After each unit conversion, make a break line.</li>
+	<li>The program should keep processing user input until they enter <code class="java">exit</code>.</li>
+</ol>
+
+<h2>Examples</h2>
+
+<p><strong>Example 1</strong></p>
+
+<pre><code class="java">Enter what you want to convert (or exit): 1 degree Celsius to kelvins
+1.0 degree Celsius is 274.15 kelvins
+
+Enter what you want to convert (or exit): -272.15 dc to K
+-272.15 degrees Celsius is 1.0 kelvin
+
+Enter what you want to convert (or exit): 1 kn to feet
+Conversion from ??? to feet is impossible
+
+Enter what you want to convert (or exit): 1 km to feet
+1.0 kilometer is 3280.839895013123 feet
+
+Enter what you want to convert (or exit): 3 pount to ounces
+Conversion from ??? to ounces is impossible
+
+Enter what you want to convert (or exit): 3 pound to ounces
+3.0 pounds is 47.99999999999999 ounces
+
+Enter what you want to convert (or exit): 3 kelvins to grams
+Conversion from kelvins to grams is impossible
+
+Enter what you want to convert (or exit): exit</code></pre>
+
+<p><strong>Example 2</strong></p>
+
+<pre><code class="java">Enter what you want to convert (or exit): 1 F in K
+1.0 degree Fahrenheit is 255.92777777777778 kelvins
+
+Enter what you want to convert (or exit): 1 K in F
+1.0 kelvin is -457.87 degrees Fahrenheit
+
+Enter what you want to convert (or exit): 1 C in K
+1.0 degree Celsius is 274.15 kelvins
+
+Enter what you want to convert (or exit): 1 K in C
+1.0 kelvin is -272.15 degrees Celsius
+
+Enter what you want to convert (or exit): 1 F in C
+1.0 degree Fahrenheit is -17.22222222222222 degrees Celsius
+
+Enter what you want to convert (or exit): 1 C in F
+1.0 degree Celsius is 33.8 degrees Fahrenheit
+
+Enter what you want to convert (or exit): one boa in parrots
+Parse error
+
+Enter what you want to convert (or exit): please convert distance to the Moon to steps
+Parse error
+
+Enter what you want to convert (or exit): many things to improve!
+Parse error
+
+Enter what you want to convert (or exit): exit</code></pre>

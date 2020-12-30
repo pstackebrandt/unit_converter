@@ -1,0 +1,83 @@
+<h2>Description</h2>
+
+<p>Your program is now pretty helpful when it comes to converting length units. There's still room for improvement: let's make the program able to convert not just to meters but to any unit of measurement. </p>
+
+<p>Speaking of "any unit of measurement"!  What if you are cooking and the recipe uses units of weight that are unfamiliar to you? Let's add more units of measurement to our converter, as well!</p>
+
+<p>In this stage, your program should be able to convert values from any supported unit of length or weight to any other appropriate unit. The user should input the number, the source unit of measurement, a transition word (for example, "in" or "to", but it can be any random word), and finally, the target unit. This scheme looks like this: <code class="java">x kg to mg</code>, <code class="java">y pound in kg</code>. </p>
+
+<p>Your program should be able to work with the following additional units:</p>
+
+<ul>
+	<li><strong>Grams</strong>: the user can input "g", "gram", or "grams".</li>
+	<li><strong>Kilograms</strong>: the user can input "kg", "kilogram", or "kilograms".</li>
+	<li><strong>Milligrams</strong>: the user can input "mg", "milligram", or "milligrams".</li>
+	<li><strong>Pounds</strong>: the user can input "lb", "pound", or "pounds".</li>
+	<li><strong>Ounces</strong>: the user can input "oz", "ounce", or "ounces".</li>
+</ul>
+
+<p>Hard-coding all these conversion rates is possible but not very efficient. A smarter way would be to convert the input value to one intermediate "hub" unit and only then convert that intermediate value to the target value. The intermediate units could be <strong>meters</strong> for length and <strong>grams</strong> for weight. To convert weight units to grams, use the following rates:</p>
+
+<ul>
+	<li>One gram equals 1 gram.</li>
+	<li>One kilogram equals 1000 grams.</li>
+	<li>One milligram equals 0.001 grams.</li>
+	<li>One pound equals 453.592 grams.</li>
+	<li>One ounce equals 28.3495 grams.</li>
+</ul>
+
+<p>For your convenience, make a break line after each unit conversion.</p>
+
+<p>In this stage, your program should also be able to handle errors. If the user attempts to perform an impossible conversion, for example, meters to kilograms, the program should output an appropriate error message: <code class="java">Convertion from meters to kilograms is impossible</code>. If the program cannot recognize one of the units or both, output a message <code class="java">Convertion from ??? to kilograms is impossible</code> where <code class="java">???</code> marks the unknown unit.</p>
+
+<p>Finally, since we have all these new units, let's make our program run until the user decides to exit the converter.</p>
+
+<h2>Objectives</h2>
+
+<ol>
+	<li>Your program should be able to convert values from any unit of length or weight to any other.</li>
+	<li>The user input should be case insensitive. </li>
+	<li>The output should contain the full names of units.</li>
+	<li>If the value is 1.0, the name of the unit must be singular, for example, "1.0 kilogram" but "1.1 kilograms".</li>
+	<li>After each unit conversion, make a break line.</li>
+	<li>Your program should be able to handle input errors. In the error message, both measurement types should be written in plural, not singular.</li>
+	<li>The program should keep processing user input until the user enters <code class="java">exit</code>.</li>
+</ol>
+
+<h2>Examples</h2>
+
+<p><strong>Example 1</strong></p>
+
+<pre><code class="java">Enter what you want to convert (or exit): 1 kg to ounces
+1.0 kilogram is 35.27399072294044 ounces
+
+Enter what you want to convert (or exit): 2 meters in yards
+2.0 meters is 2.1872265966754156 yards
+
+Enter what you want to convert (or exit): 1 pound in kg
+1.0 pound is 0.453592 kilograms
+
+Enter what you want to convert (or exit): exit</code></pre>
+
+<p><strong>Example 2</strong></p>
+
+<pre><code class="java">Enter what you want to convert (or exit): 1 oz to g
+1.0 ounce is 28.3495 grams
+
+Enter what you want to convert (or exit): 100 cm in meters
+100.0 centimeters is 1.0 meter
+
+Enter what you want to convert (or exit): 23.34 feet to in
+23.34 feet is 280.08 inches
+
+Enter what you want to convert (or exit): exit</code></pre>
+
+<p><strong>Example 3</strong></p>
+
+<pre><code class="java">Enter what you want to convert (or exit): 1 kn to feet
+Conversion from ??? to feet is impossible
+
+Enter what you want to convert (or exit): 3 grams to meters
+Conversion from grams to meters is impossible
+
+Enter what you want to convert (or exit): exit</code></pre>
