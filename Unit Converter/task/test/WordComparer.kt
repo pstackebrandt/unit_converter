@@ -44,7 +44,7 @@ class InputToken(
 class WordComparer(
         val myStr: String,
         val hisStr: String,
-        val roundDoubleTo: Int = 7,
+        val roundDoubleTo: Int = 2,
         val integersAsDoubles: Boolean = false,
         val trimErrorOnlyByLine: Boolean = true,
         val errorContextStd: Int = 1,

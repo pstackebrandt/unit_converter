@@ -289,6 +289,40 @@ files:
     }
 
   learner_created: false
+- name: src/converter/Converter.kt
+  visible: true
+  text: |
+    package converter
+
+    import java.util.*
+
+    class Converter {
+        companion object {
+            fun convertKmToM() {
+                val kilometer = askForKm()
+                val meter = convertKmToM(kilometer)
+                println("$kilometer kilometers is $meter meters")
+            }
+
+            private fun askForKm(): Int {
+                println("Enter a number of kilometers:")
+                val scanner = Scanner(System.`in`)
+                return scanner.nextInt()
+            }
+
+            private fun convertKmToM(km: Int) = km * 1_000
+        }
+    }
+  learner_created: true
+- name: test/converter/LengthMeasureTest.kt
+  visible: true
+  learner_created: true
+- name: src/converter/LengthMeasure.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/70/stages/387/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Thu, 31 Dec 2020 21:35:44 UTC
 record: -1

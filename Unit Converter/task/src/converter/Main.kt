@@ -1,7 +1,7 @@
 package converter
 
 fun main() {
-    Converter.convertKmToM()
+    Converter.convertToMeter()
 
 // 145 centimeters is 1.45 meters
 //2 miles is 3.2187 kilometers
