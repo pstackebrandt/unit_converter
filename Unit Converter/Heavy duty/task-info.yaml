@@ -321,6 +321,162 @@ files:
         }
     }
   learner_created: false
+- name: src/converter/Converter.kt
+  visible: true
+  text: |+
+    package converter
+
+    import java.util.*
+
+    class Converter {
+        companion object {
+            fun convertToMeter() {
+                val (number, measure) = askForLength()
+                val lengthMeasureInput: LengthMeasure
+                try {
+                    lengthMeasureInput = categorizeMeasure(measure)
+                } catch (exc: IllegalArgumentException) {
+                    println(exc.message)
+                    return
+                }
+
+                try {
+                    val (meters, lengthMeasure) = convertToMeter(number, lengthMeasureInput)
+                    println("$number ${lengthMeasureInput.getMeasureText(number)} is $meters ${lengthMeasure.getMeasureText(meters)}")
+                } catch (exc: IllegalArgumentException) {
+                    println(exc.message)
+                }
+            }
+
+            private fun categorizeMeasure(measure: String): LengthMeasure {
+                val work = measure.trim().toLowerCase()
+
+                return when {
+                    LengthMeasure.Meter.isEqualExceptCase(work) -> LengthMeasure.Meter
+                    LengthMeasure.Kilometer.isEqualExceptCase(work) -> LengthMeasure.Kilometer
+                    LengthMeasure.Centimeter.isEqualExceptCase(work) -> LengthMeasure.Centimeter
+                    LengthMeasure.Millimeter.isEqualExceptCase(work) -> LengthMeasure.Millimeter
+                    LengthMeasure.Mile.isEqualExceptCase(work) -> LengthMeasure.Mile
+                    LengthMeasure.Yard.isEqualExceptCase(work) -> LengthMeasure.Yard
+                    LengthMeasure.Foot.isEqualExceptCase(work) -> LengthMeasure.Foot
+                    LengthMeasure.Inch.isEqualExceptCase(work) -> LengthMeasure.Inch
+
+                    else -> throw IllegalArgumentException("Unexpected value for measure")
+                }
+            }
+
+            private fun askForLength(): Pair<Double, String> {
+                println("Enter a number and a measure of length:")
+                val scanner = Scanner(System.`in`)
+                val number = scanner.nextDouble()
+                val measure = scanner.next()
+                return number to measure
+            }
+
+            private fun convertToMeter(number: Double, measure: LengthMeasure): Pair<Double, LengthMeasure> {
+                return when (measure) {
+                    LengthMeasure.Meter -> number to LengthMeasure.Meter
+                    LengthMeasure.Kilometer -> number * 1_000 to LengthMeasure.Meter
+                    LengthMeasure.Centimeter -> number * 0.01 to LengthMeasure.Meter
+                    LengthMeasure.Millimeter -> number * 0.001 to LengthMeasure.Meter
+                    LengthMeasure.Mile -> number * 1609.35 to LengthMeasure.Meter
+                    LengthMeasure.Yard -> number * 0.9144 to LengthMeasure.Meter
+                    LengthMeasure.Foot -> number * 0.3048 to LengthMeasure.Meter
+                    LengthMeasure.Inch -> number * 0.0254 to LengthMeasure.Meter
+                }
+            }
+        }
+    }
+
+  learner_created: true
+- name: src/converter/Units.kt
+  visible: true
+  text: |-
+    package converter
+
+    enum class LengthMeasure(private val plural: String, private val short: String) {
+        Meter("Meters", "m"),
+        Kilometer("Kilometers", "km"),
+        Centimeter("Centimeters", "cm"),
+        Millimeter("Millimeters", "mm"),
+        Mile("Miles", "mi"),
+        Yard("Yards", "yd"),
+        Foot("Feet", "ft"),
+        Inch("Inches", "in");
+
+        fun isEqualExceptCase(measureValue: String) =
+                when (measureValue.toLowerCase()) {
+                    name.toLowerCase(), plural.toLowerCase(), short.toLowerCase() -> true
+                    else -> false
+                }
+
+        /** Get long measure name in singular or plural. Result depends on [value] and is in lowercase. */
+        fun getMeasureText(value: Double): String {
+            return if (value == 1.0) {
+                name.toLowerCase()
+            } else {
+                plural.toLowerCase()
+            }
+        }
+    }
+  learner_created: true
+- name: src/converter/CustomExceptions.kt
+  visible: true
+  learner_created: true
+- name: test/converter/LengthMeasureTest.kt
+  visible: true
+  text: |-
+    package converter
+
+    import org.junit.Assert
+    import org.junit.Test
+
+    @Suppress("unused")
+    class LengthMeasureTest {
+        class IsEqualTest {
+            @Test
+            fun `should accept meter short`() {
+                val actual = LengthMeasure.Meter.isEqualExceptCase("M")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should accept meter singular`() {
+                val actual = LengthMeasure.Meter.isEqualExceptCase("MeTer")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should accept meter plural`() {
+                val actual = LengthMeasure.Meter.isEqualExceptCase("MeTerS")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should reject unexpected value`() {
+                val actual = LengthMeasure.Meter.isEqualExceptCase("Meister")
+                Assert.assertFalse(actual)
+            }
+        }
+
+        class GetMeasureTextTest {
+            @Test
+            fun `should return singular`() {
+                val actual = LengthMeasure.Meter.getMeasureText(1.0)
+                Assert.assertEquals("meter", actual)
+            }
+
+            @Test
+            fun `should return plural`() {
+                val actual = LengthMeasure.Meter.getMeasureText(1.1)
+                Assert.assertEquals("meters", actual)
+            }
+        }
+    }
+  learner_created: false
 feedback_link: https://hyperskill.org/projects/70/stages/388/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sat, 02 Jan 2021 17:16:52 UTC
 record: -1

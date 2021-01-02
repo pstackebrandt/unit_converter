@@ -8,25 +8,25 @@ class LengthMeasureTest {
     class IsEqualTest {
         @Test
         fun `should accept meter short`() {
-            val actual = LengthMeasure.Meter.isEqualExceptCase("M")
+            val actual = LengthUnit.Meter.isEqualMeaning("M")
             Assert.assertTrue(actual)
         }
 
         @Test
         fun `should accept meter singular`() {
-            val actual = LengthMeasure.Meter.isEqualExceptCase("MeTer")
+            val actual = LengthUnit.Meter.isEqualMeaning("MeTer")
             Assert.assertTrue(actual)
         }
 
         @Test
         fun `should accept meter plural`() {
-            val actual = LengthMeasure.Meter.isEqualExceptCase("MeTerS")
+            val actual = LengthUnit.Meter.isEqualMeaning("MeTerS")
             Assert.assertTrue(actual)
         }
 
         @Test
         fun `should reject unexpected value`() {
-            val actual = LengthMeasure.Meter.isEqualExceptCase("Meister")
+            val actual = LengthUnit.Meter.isEqualMeaning("Meister")
             Assert.assertFalse(actual)
         }
     }
@@ -34,13 +34,13 @@ class LengthMeasureTest {
     class GetMeasureTextTest {
         @Test
         fun `should return singular`() {
-            val actual = LengthMeasure.Meter.getMeasureText(1.0)
+            val actual = LengthUnit.Meter.getLongName(1.0)
             Assert.assertEquals("meter", actual)
         }
 
         @Test
         fun `should return plural`() {
-            val actual = LengthMeasure.Meter.getMeasureText(1.1)
+            val actual = LengthUnit.Meter.getLongName(1.1)
             Assert.assertEquals("meters", actual)
         }
     }
