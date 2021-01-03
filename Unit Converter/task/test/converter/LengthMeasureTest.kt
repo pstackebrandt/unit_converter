@@ -31,6 +31,21 @@ class LengthMeasureTest {
         }
     }
 
+    class IsExitTest {
+        @Test
+        fun `should detect exit`() {
+            val actual = Converter.isExit("1", "brexit", "4")
+            Assert.assertTrue(actual)
+        }
+
+        @Test
+        fun `should not detect exit`() {
+            val actual = Converter.isExit("1", "brexi", "4")
+            Assert.assertFalse(actual)
+        }
+
+    }
+
     class GetMeasureTextTest {
         @Test
         fun `should return singular`() {

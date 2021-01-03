@@ -9,13 +9,13 @@ class Converter {
             while (true) {
                 val (valueText, fromUnitText, toUnitText) = getInput()
 
-                if (isExit(valueText) || isExit(fromUnitText) || isExit(toUnitText)) {
+                if (isExit(valueText, fromUnitText, toUnitText)) {
                     return
                 }
 
                 val value = valueText.toDoubleOrNull()
                 if (value == null) {
-                    println("Input must start with number or 'exit'.")
+                    println("Parse error")
                     continue
                 }
 
@@ -69,8 +69,14 @@ class Converter {
             }
         }
 
-        private fun isExit(text: String) =
-                text.trim().toLowerCase() == "exit"
+        internal fun isExit(vararg text: String): Boolean {
+            text.forEach {
+                if (it.toLowerCase().contains("exit")) {
+                    return true
+                }
+            }
+            return false
+        }
 
         /** may throw IllegalArgumentException */
         private fun categorizeUnit(unit: String): Unit {
@@ -117,11 +123,19 @@ class Converter {
             if (isExit(number)) {
                 return getExitTriple()
             }
-            val fromUnit = scanner.next()
-            scanner.next() // should be "to"
-            val toUnit = scanner.next()
+            var fromUnit = scanner.next()
+            if (isDegree(fromUnit)) {
+                fromUnit = scanner.next()
+            }
+            scanner.next() // unused word
+            var toUnit = scanner.next()
+            if (isDegree(toUnit)) {
+                toUnit = scanner.next()
+            }
             return Triple(number, fromUnit, toUnit)
         }
+
+        private fun isDegree(fromUnit: String) = fromUnit.toLowerCase().contains("degree")
 
         private fun getExitTriple() = Triple("exit", "", "")
 
