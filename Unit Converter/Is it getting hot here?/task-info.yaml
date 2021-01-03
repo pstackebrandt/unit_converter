@@ -360,6 +360,364 @@ files:
         }
     }
   learner_created: false
+- name: test/converter/LengthMeasureTest.kt
+  visible: true
+  text: |-
+    package converter
+
+    import org.junit.Assert
+    import org.junit.Test
+
+    @Suppress("unused")
+    class LengthMeasureTest {
+        class IsEqualTest {
+            @Test
+            fun `should accept meter short`() {
+                val actual = LengthUnit.Meter.isEqualMeaning("M")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should accept meter singular`() {
+                val actual = LengthUnit.Meter.isEqualMeaning("MeTer")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should accept meter plural`() {
+                val actual = LengthUnit.Meter.isEqualMeaning("MeTerS")
+                Assert.assertTrue(actual)
+            }
+
+            @Test
+            fun `should reject unexpected value`() {
+                val actual = LengthUnit.Meter.isEqualMeaning("Meister")
+                Assert.assertFalse(actual)
+            }
+        }
+
+        class GetMeasureTextTest {
+            @Test
+            fun `should return singular`() {
+                val actual = LengthUnit.Meter.getLongName(1.0)
+                Assert.assertEquals("meter", actual)
+            }
+
+            @Test
+            fun `should return plural`() {
+                val actual = LengthUnit.Meter.getLongName(1.1)
+                Assert.assertEquals("meters", actual)
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/CustomExceptions.kt
+  visible: true
+  text: |-
+    package converter
+
+    class ConversionOfIncompatibleTypesException(message: String) : java.lang.IllegalArgumentException(message)
+  learner_created: true
+- name: src/converter/Converter.kt
+  visible: true
+  text: |+
+    package converter
+
+    import java.util.*
+    import kotlin.NoSuchElementException
+
+    class Converter {
+        companion object {
+            fun convert() {
+                while (true) {
+                    val (valueText, fromUnitText, toUnitText) = getInput()
+
+                    if (isExit(valueText) || isExit(fromUnitText) || isExit(toUnitText)) {
+                        return
+                    }
+
+                    val value = valueText.toDoubleOrNull()
+                    if (value == null) {
+                        println("Input must start with number or 'exit'.")
+                        continue
+                    }
+
+                    val fromUnit = getUnit(fromUnitText)
+                    val toUnit = getUnit(toUnitText)
+
+                    if (isUnknownUnitError(fromUnit, toUnit)) {
+                        println(getUnknownUnitErrorMessage(fromUnit, toUnit))
+                        continue
+                    }
+
+                    try {
+                        val (resultValue, resultUnit) = convert(value, fromUnit, toUnit)
+                        println(getMessageWithConversionResult(value, fromUnit, resultValue, resultUnit))
+                    } catch (exc: ConversionOfIncompatibleTypesException) {
+                        println(getMessageConversionOfDifferentUnitTypesImpossible(fromUnit, toUnit))
+                    } catch (exc: IllegalArgumentException) {
+                        println(exc.message)
+                    }
+                }
+            }
+
+            private fun getMessageWithConversionResult(value: Double, fromUnit: Unit, resultValue: Double, resultUnit: Unit) =
+                    "$value ${fromUnit.getLongName(value)} is $resultValue ${resultUnit.getLongName(resultValue)}"
+
+            private fun getMessageConversionOfDifferentUnitTypesImpossible(fromUnit: Unit, toUnit: Unit) =
+                    "Conversion from ${fromUnit.plural.toLowerCase()} to ${toUnit.plural.toLowerCase()} is impossible"
+
+            private fun isUnknownUnitError(fromUnit: Unit, toUnit: Unit) =
+                    fromUnit == UnitError.UnknownUnit || toUnit == UnitError.UnknownUnit
+
+            private fun getUnknownUnitErrorMessage(fromUnit: Unit, toUnit: Unit) =
+                    "Conversion from ${
+                        getLongUnitNameOrUnknownUnitSign(fromUnit)
+                    } to ${
+                        getLongUnitNameOrUnknownUnitSign(toUnit)
+                    } is impossible"
+
+            private fun getLongUnitNameOrUnknownUnitSign(fromUnit: Unit) =
+                    if (fromUnit == UnitError.UnknownUnit) {
+                        "???"
+                    } else {
+                        fromUnit.plural.toLowerCase()
+                    }
+
+            private fun getUnit(fromUnitText: String): Unit {
+                return try {
+                    categorizeUnit(fromUnitText)
+                } catch (exc: IllegalArgumentException) {
+                    UnitError.UnknownUnit
+                }
+            }
+
+            private fun isExit(text: String) =
+                    text.trim().toLowerCase() == "exit"
+
+            /** may throw IllegalArgumentException */
+            private fun categorizeUnit(unit: String): Unit {
+                val lowercaseUnit = unit.trim().toLowerCase()
+
+                return try {
+                    getLengthUnit(lowercaseUnit)
+                } catch (exc: IllegalArgumentException) {
+                    getMassUnit(lowercaseUnit) // may throw
+                }
+            }
+
+            private fun getLengthUnit(unitText: String): Unit {
+                return when {
+                    LengthUnit.Meter.isEqualMeaning(unitText) -> LengthUnit.Meter
+                    LengthUnit.Kilometer.isEqualMeaning(unitText) -> LengthUnit.Kilometer
+                    LengthUnit.Centimeter.isEqualMeaning(unitText) -> LengthUnit.Centimeter
+                    LengthUnit.Millimeter.isEqualMeaning(unitText) -> LengthUnit.Millimeter
+                    LengthUnit.Mile.isEqualMeaning(unitText) -> LengthUnit.Mile
+                    LengthUnit.Yard.isEqualMeaning(unitText) -> LengthUnit.Yard
+                    LengthUnit.Foot.isEqualMeaning(unitText) -> LengthUnit.Foot
+                    LengthUnit.Inch.isEqualMeaning(unitText) -> LengthUnit.Inch
+                    else -> throw IllegalArgumentException("Unexpected value for unit")
+                }
+            }
+
+            private fun getMassUnit(unitText: String): Unit {
+                return when {
+                    MassUnit.Gram.isEqualMeaning(unitText) -> MassUnit.Gram
+                    MassUnit.Kilogram.isEqualMeaning(unitText) -> MassUnit.Kilogram
+                    MassUnit.Milligram.isEqualMeaning(unitText) -> MassUnit.Milligram
+                    MassUnit.Pound.isEqualMeaning(unitText) -> MassUnit.Pound
+                    MassUnit.Ounce.isEqualMeaning(unitText) -> MassUnit.Ounce
+
+                    else -> throw IllegalArgumentException("Unexpected value for unit")
+                }
+            }
+
+            /** Get number, fromUnit, toUnit */
+            private fun getInput(): Triple<String, String, String> {
+                println("Enter what you want to convert (or exit):")
+                val scanner = Scanner(System.`in`)
+                val number = scanner.next()
+                if (isExit(number)) {
+                    return getExitTriple()
+                }
+                val fromUnit = scanner.next()
+                scanner.next() // should be "to"
+                val toUnit = scanner.next()
+                return Triple(number, fromUnit, toUnit)
+            }
+
+            private fun getExitTriple() = Triple("exit", "", "")
+
+            /** Convert [number] from [sourceUnit] to [destinationUnit]
+             * throws IllegalArgumentException*/
+            private fun convert(number: Double, sourceUnit: Unit, destinationUnit: Unit):
+                    Pair<Double, Unit> {
+                if (!(sourceUnit is LengthUnit && destinationUnit is LengthUnit) xor
+                        (sourceUnit is MassUnit && destinationUnit is MassUnit)) {
+                    throw ConversionOfIncompatibleTypesException("Units have different type.")
+                }
+
+                val (baseValue, _) = when (sourceUnit) {
+                    is LengthUnit -> convertToMeter(sourceUnit, number)
+                    is MassUnit -> convertToGram(sourceUnit, number)
+                    else -> throw IllegalArgumentException("Unexpected unit type")
+                }
+
+                return when (sourceUnit) {
+                    is LengthUnit -> convertFromMeter(destinationUnit, baseValue)
+                    is MassUnit -> convertFromGram(destinationUnit, baseValue)
+                    else -> throw IllegalArgumentException("Unexpected unit type")
+                }
+            }
+
+            /** may throw NoSuchElementException() */
+            private fun convertToMeter(sourceUnit: Unit, number: Double): Pair<Double, LengthUnit> {
+                return when (sourceUnit) {
+                    LengthUnit.Meter -> number to LengthUnit.Meter
+                    LengthUnit.Kilometer -> number * 1_000 to LengthUnit.Meter
+                    LengthUnit.Centimeter -> number * 0.01 to LengthUnit.Meter
+                    LengthUnit.Millimeter -> number * 0.001 to LengthUnit.Meter
+                    LengthUnit.Mile -> number * 1609.35 to LengthUnit.Meter
+                    LengthUnit.Yard -> number * 0.9144 to LengthUnit.Meter
+                    LengthUnit.Foot -> number * 0.3048 to LengthUnit.Meter
+                    LengthUnit.Inch -> number * 0.0254 to LengthUnit.Meter
+                    else -> throw NoSuchElementException()
+                }
+            }
+
+            /** may throw NoSuchElementException() */
+            private fun convertToGram(sourceUnit: Unit, number: Double): Pair<Double, MassUnit> {
+                return when (sourceUnit) {
+                    MassUnit.Gram -> number to MassUnit.Gram
+                    MassUnit.Kilogram -> number * 1_000 to MassUnit.Gram
+                    MassUnit.Milligram -> number * 0.001 to MassUnit.Gram
+                    MassUnit.Pound -> number * 453.592 to MassUnit.Gram
+                    MassUnit.Ounce -> number * 28.3495 to MassUnit.Gram
+                    else -> throw NoSuchElementException()
+                }
+            }
+
+            /** may throw NoSuchElementException() */
+            private fun convertFromMeter(destinationUnit: Unit, number: Double): Pair<Double, LengthUnit> {
+                return when (destinationUnit) {
+                    LengthUnit.Meter -> number to LengthUnit.Meter
+                    LengthUnit.Kilometer -> number * 0.001 to LengthUnit.Kilometer
+                    LengthUnit.Centimeter -> number * 100 to LengthUnit.Centimeter
+                    LengthUnit.Millimeter -> number * 1_000 to LengthUnit.Millimeter
+                    LengthUnit.Mile -> number * (1 / 1609.35) to LengthUnit.Mile
+                    LengthUnit.Yard -> number * (1 / 0.9144) to LengthUnit.Yard
+                    LengthUnit.Foot -> number * (1 / 0.3048) to LengthUnit.Foot
+                    LengthUnit.Inch -> number * (1 / 0.0254) to LengthUnit.Inch
+                    else -> throw NoSuchElementException()
+                }
+            }
+
+            /** may throw NoSuchElementException() */
+            private fun convertFromGram(destinationUnit: Unit, number: Double): Pair<Double, MassUnit> {
+                return when (destinationUnit) {
+                    MassUnit.Gram -> number to MassUnit.Gram
+                    MassUnit.Kilogram -> number * 0.001 to MassUnit.Kilogram
+                    MassUnit.Milligram -> number * 1_000 to MassUnit.Milligram
+                    MassUnit.Pound -> number * (1 / 453.592) to MassUnit.Pound
+                    MassUnit.Ounce -> number * (1 / 28.3495) to MassUnit.Ounce
+                    else -> throw NoSuchElementException()
+                }
+            }
+        }
+    }
+
+  learner_created: true
+- name: src/converter/Units.kt
+  visible: true
+  text: |+
+    package converter
+
+    interface Unit {
+        val plural: String
+        val short: String
+        val name: String
+
+        /** Check ignores case. */
+        fun isEqualMeaning(unitText: String) =
+                when (unitText.toLowerCase()) {
+                    name.toLowerCase(), plural.toLowerCase(), short.toLowerCase() -> true
+                    else -> false
+                }
+
+        /** Get long unit name in singular or plural. Result depends on [value] and is in lowercase. */
+        fun getLongName(value: Double): String {
+            return if (value == 1.0) {
+                name.toLowerCase()
+            } else {
+                plural.toLowerCase()
+            }
+        }
+    }
+
+    enum class LengthUnit(override val plural: String, override val short: String) : Unit {
+        Meter("Meters", "m"),
+        Kilometer("Kilometers", "km"),
+        Centimeter("Centimeters", "cm"),
+        Millimeter("Millimeters", "mm"),
+        Mile("Miles", "mi"),
+        Yard("Yards", "yd"),
+        Foot("Feet", "ft"),
+        Inch("Inches", "in")
+    }
+
+    enum class MassUnit(override val plural: String, override val short: String) : Unit {
+        Gram("grams", "g"),
+        Kilogram("kilograms", "kg"),
+        Milligram("milligrams", "mg"),
+        Pound("pounds", "lb"),
+        Ounce("ounces", "oz"),
+    }
+
+    enum class UnitError(override val plural: String, override val short: String) : Unit {
+        UnknownUnit("unknown units", "???"),
+    }
+
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/70/stages/389/implement#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #1
+
+    Your line &quot;Conversion from ??? to ??? is impossible&quot;
+    doesn&#39;t match with &quot;Enter what you want to convert (or exit): 1.0 degree Celsius is 274.15 kelvins&quot;
+    in parts &quot;conversion&quot; and &quot;1.0&quot;.
+
+    Please find below the output of your program during this failed test.
+    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.
+
+    ---
+
+    Enter what you want to convert (or exit):
+    &gt; 1 degree Celsius to kelvins
+    Conversion from ??? to ??? is impossible
+    Enter what you want to convert (or exit):
+    &gt; -272.15 dc to K
+    Conversion from ??? to ??? is impossible
+    Enter what you want to convert (or exit):
+    &gt; 1 kn to feet
+    Conversion from ??? to feet is impossible
+    Enter what you want to convert (or exit):
+    &gt; 1 km to feet
+    1.0 kilometer is 3280.839895013123 feet
+    Enter what you want to convert (or exit):
+    &gt; 3 pount to ounces
+    Conversion from ??? to ounces is impossible
+    Enter what you want to convert (or exit):
+    &gt; 3 pound to ounces
+    3.0 pounds is 48.0 ounces
+    Enter what you want to convert (or exit):
+    &gt; 3 kelvins to grams
+    Conversion from ??? to grams is impossible
+    Enter what you want to convert (or exit):
+    &gt; 3 grams to meters
+    Conversion from grams to meters is impossible
+    Enter what you want to convert (or exit):
+    &gt; exit
+  time: Sun, 03 Jan 2021 00:07:37 UTC
 record: -1

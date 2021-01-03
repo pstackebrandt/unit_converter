@@ -41,6 +41,7 @@ enum class MassUnit(override val plural: String, override val short: String) : U
     Ounce("ounces", "oz"),
 }
 
+
 enum class UnitError(override val plural: String, override val short: String) : Unit {
     UnknownUnit("unknown units", "???"),
 }

@@ -7,15 +7,14 @@ class Converter {
     companion object {
         fun convert() {
             while (true) {
-                val (valueText, fromUnitText, toUnitText) = getInput()
-
-                if (isExit(valueText) || isExit(fromUnitText) || isExit(toUnitText)) {
+                val (valueText, fromUnitText, toUnitText) = getInputCleaned()
+                if (isExit(valueText, fromUnitText, toUnitText)) {
                     return
                 }
 
                 val value = valueText.toDoubleOrNull()
                 if (value == null) {
-                    println("Input must start with number or 'exit'.")
+                    println("Parse error")
                     continue
                 }
 
@@ -69,8 +68,14 @@ class Converter {
             }
         }
 
-        private fun isExit(text: String) =
-                text.trim().toLowerCase() == "exit"
+        internal fun isExit(vararg text: String): Boolean {
+            text.forEach {
+                if (it.toLowerCase().contains("exit")) {
+                    return true
+                }
+            }
+            return false
+        }
 
         /** may throw IllegalArgumentException */
         private fun categorizeUnit(unit: String): Unit {
@@ -109,19 +114,41 @@ class Converter {
             }
         }
 
+        private fun getTemperatureUnit(unitText: String): Unit {
+            return when {
+                MassUnit.Gram.isEqualMeaning(unitText) -> MassUnit.Gram
+                MassUnit.Kilogram.isEqualMeaning(unitText) -> MassUnit.Kilogram
+                MassUnit.Milligram.isEqualMeaning(unitText) -> MassUnit.Milligram
+                MassUnit.Pound.isEqualMeaning(unitText) -> MassUnit.Pound
+                MassUnit.Ounce.isEqualMeaning(unitText) -> MassUnit.Ounce
+
+                else -> throw IllegalArgumentException("Unexpected value for unit")
+            }
+        }
+
         /** Get number, fromUnit, toUnit */
-        private fun getInput(): Triple<String, String, String> {
+        private fun getInputCleaned(): Triple<String, String, String> {
             println("Enter what you want to convert (or exit):")
             val scanner = Scanner(System.`in`)
-            val number = scanner.next()
+            val number = nextAndClean(scanner)
             if (isExit(number)) {
                 return getExitTriple()
             }
-            val fromUnit = scanner.next()
-            scanner.next() // should be "to"
-            val toUnit = scanner.next()
+            var fromUnit = nextAndClean(scanner)
+            if (isDegree(fromUnit)) {
+                fromUnit = nextAndClean(scanner)
+            }
+            scanner.next() // unused word
+            var toUnit = nextAndClean(scanner)
+            if (isDegree(toUnit)) {
+                toUnit = nextAndClean(scanner)
+            }
             return Triple(number, fromUnit, toUnit)
         }
+
+        private fun nextAndClean(scanner: Scanner) = scanner.next().trim().toLowerCase()
+
+        private fun isDegree(fromUnit: String) = fromUnit.toLowerCase().contains("degree")
 
         private fun getExitTriple() = Triple("exit", "", "")
 
