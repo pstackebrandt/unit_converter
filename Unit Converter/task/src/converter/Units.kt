@@ -49,7 +49,7 @@ enum class MassUnit(override val singular: String, override val plural: String, 
 
 enum class TemperatureUnit(override val singular: String, override val plural: String, override val short: List<String>) : Unit {
     Celsius("degree Celsius", "degrees Celsius", listOf("dc", "c")),
-    Kelvin("degree Kelvin", "degrees Kelvin", listOf("dk", "k")),
+    Kelvin("kelvin", "kelvins", listOf("dk", "k")),
     Fahrenheit("degree Fahrenheit", "degrees Fahrenheit", listOf("df", "f")),
 }
 

@@ -31,6 +31,7 @@ class LengthMeasureTest {
         }
     }
 
+    @Suppress("SpellCheckingInspection")
     class IsExitTest {
         @Test
         fun `should detect exit`() {

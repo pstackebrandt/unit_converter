@@ -11,7 +11,6 @@ class Converter {
                 if (isExit(valueText, fromUnitText, toUnitText)) {
                     return
                 }
-
                 val value = valueText.toDoubleOrNull()
                 if (value == null) {
                     println("Parse error")
@@ -23,6 +22,12 @@ class Converter {
 
                 if (isUnknownUnitError(fromUnit, toUnit)) {
                     println(getUnknownUnitErrorMessage(fromUnit, toUnit))
+                    continue
+                }
+
+                if (value < 0 &&
+                        (fromUnit is LengthUnit || fromUnit is MassUnit)) {
+                    println("${if (fromUnit is LengthUnit) "Length" else "Weight"} shouldn't be negative.")
                     continue
                 }
 
@@ -79,16 +84,21 @@ class Converter {
 
         /** may throw IllegalArgumentException */
         private fun categorizeUnit(unit: String): Unit {
-            val lowercaseUnit = unit.trim().toLowerCase()
+            val cleanUnit = unit.trim().toLowerCase()
 
             return try {
-                getLengthUnit(lowercaseUnit)
+                getLengthUnit(cleanUnit)
             } catch (exc: IllegalArgumentException) {
-                getMassUnit(lowercaseUnit) // may throw
+                return try {
+                    getMassUnit(cleanUnit)
+                } catch (exc: IllegalArgumentException) {
+                    //println("call getTemperatureUnit($cleanUnit)")
+                    getTemperatureUnit(cleanUnit)
+                }
             }
         }
 
-        private fun getLengthUnit(unitText: String): Unit {
+        private fun getLengthUnit(unitText: String): LengthUnit {
             return when {
                 LengthUnit.Meter.isEqualMeaning(unitText) -> LengthUnit.Meter
                 LengthUnit.Kilometer.isEqualMeaning(unitText) -> LengthUnit.Kilometer
@@ -102,7 +112,7 @@ class Converter {
             }
         }
 
-        private fun getMassUnit(unitText: String): Unit {
+        private fun getMassUnit(unitText: String): MassUnit {
             return when {
                 MassUnit.Gram.isEqualMeaning(unitText) -> MassUnit.Gram
                 MassUnit.Kilogram.isEqualMeaning(unitText) -> MassUnit.Kilogram
@@ -114,14 +124,11 @@ class Converter {
             }
         }
 
-        private fun getTemperatureUnit(unitText: String): Unit {
+        private fun getTemperatureUnit(unitText: String): TemperatureUnit {
             return when {
-                MassUnit.Gram.isEqualMeaning(unitText) -> MassUnit.Gram
-                MassUnit.Kilogram.isEqualMeaning(unitText) -> MassUnit.Kilogram
-                MassUnit.Milligram.isEqualMeaning(unitText) -> MassUnit.Milligram
-                MassUnit.Pound.isEqualMeaning(unitText) -> MassUnit.Pound
-                MassUnit.Ounce.isEqualMeaning(unitText) -> MassUnit.Ounce
-
+                TemperatureUnit.Celsius.isEqualMeaning(unitText) -> TemperatureUnit.Celsius
+                TemperatureUnit.Kelvin.isEqualMeaning(unitText) -> TemperatureUnit.Kelvin
+                TemperatureUnit.Fahrenheit.isEqualMeaning(unitText) -> TemperatureUnit.Fahrenheit
                 else -> throw IllegalArgumentException("Unexpected value for unit")
             }
         }
@@ -157,19 +164,22 @@ class Converter {
         private fun convert(number: Double, sourceUnit: Unit, destinationUnit: Unit):
                 Pair<Double, Unit> {
             if (!(sourceUnit is LengthUnit && destinationUnit is LengthUnit) xor
-                    (sourceUnit is MassUnit && destinationUnit is MassUnit)) {
+                    (sourceUnit is MassUnit && destinationUnit is MassUnit) xor
+                    (sourceUnit is TemperatureUnit && destinationUnit is TemperatureUnit)) {
                 throw ConversionOfIncompatibleTypesException("Units have different type.")
             }
 
             val (baseValue, _) = when (sourceUnit) {
                 is LengthUnit -> convertToMeter(sourceUnit, number)
                 is MassUnit -> convertToGram(sourceUnit, number)
+                is TemperatureUnit -> convertToCelsius(sourceUnit, number)
                 else -> throw IllegalArgumentException("Unexpected unit type")
             }
 
             return when (sourceUnit) {
                 is LengthUnit -> convertFromMeter(destinationUnit, baseValue)
                 is MassUnit -> convertFromGram(destinationUnit, baseValue)
+                is TemperatureUnit -> convertFromCelsius(destinationUnit, baseValue)
                 else -> throw IllegalArgumentException("Unexpected unit type")
             }
         }
@@ -202,6 +212,16 @@ class Converter {
         }
 
         /** may throw NoSuchElementException() */
+        private fun convertToCelsius(sourceUnit: Unit, number: Double): Pair<Double, TemperatureUnit> {
+            return when (sourceUnit) {
+                TemperatureUnit.Celsius -> number to TemperatureUnit.Celsius
+                TemperatureUnit.Kelvin -> number - 273.15 to TemperatureUnit.Celsius
+                TemperatureUnit.Fahrenheit -> (number - 32) * 5 / 9 to TemperatureUnit.Celsius
+                else -> throw NoSuchElementException()
+            }
+        }
+
+        /** may throw NoSuchElementException() */
         private fun convertFromMeter(destinationUnit: Unit, number: Double): Pair<Double, LengthUnit> {
             return when (destinationUnit) {
                 LengthUnit.Meter -> number to LengthUnit.Meter
@@ -224,6 +244,16 @@ class Converter {
                 MassUnit.Milligram -> number * 1_000 to MassUnit.Milligram
                 MassUnit.Pound -> number * (1 / 453.592) to MassUnit.Pound
                 MassUnit.Ounce -> number * (1 / 28.3495) to MassUnit.Ounce
+                else -> throw NoSuchElementException()
+            }
+        }
+
+        /** may throw NoSuchElementException() */
+        private fun convertFromCelsius(destinationUnit: Unit, number: Double): Pair<Double, TemperatureUnit> {
+            return when (destinationUnit) {
+                TemperatureUnit.Celsius -> number to TemperatureUnit.Celsius
+                TemperatureUnit.Kelvin -> number + 273.15 to TemperatureUnit.Kelvin
+                TemperatureUnit.Fahrenheit -> number * 9 / 5 + 32 to TemperatureUnit.Fahrenheit
                 else -> throw NoSuchElementException()
             }
         }

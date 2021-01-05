@@ -682,45 +682,8 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/70/stages/389/implement#comment
-status: Failed
+status: Solved
 feedback:
-  message: |-
-    Wrong answer in test #1
-
-    Your line &quot;Conversion from ??? to ??? is impossible&quot;
-    doesn&#39;t match with &quot;Enter what you want to convert (or exit): 1.0 degree Celsius is 274.15 kelvins&quot;
-    in parts &quot;conversion&quot; and &quot;1.0&quot;.
-
-    Please find below the output of your program during this failed test.
-    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.
-
-    ---
-
-    Enter what you want to convert (or exit):
-    &gt; 1 degree Celsius to kelvins
-    Conversion from ??? to ??? is impossible
-    Enter what you want to convert (or exit):
-    &gt; -272.15 dc to K
-    Conversion from ??? to ??? is impossible
-    Enter what you want to convert (or exit):
-    &gt; 1 kn to feet
-    Conversion from ??? to feet is impossible
-    Enter what you want to convert (or exit):
-    &gt; 1 km to feet
-    1.0 kilometer is 3280.839895013123 feet
-    Enter what you want to convert (or exit):
-    &gt; 3 pount to ounces
-    Conversion from ??? to ounces is impossible
-    Enter what you want to convert (or exit):
-    &gt; 3 pound to ounces
-    3.0 pounds is 48.0 ounces
-    Enter what you want to convert (or exit):
-    &gt; 3 kelvins to grams
-    Conversion from ??? to grams is impossible
-    Enter what you want to convert (or exit):
-    &gt; 3 grams to meters
-    Conversion from grams to meters is impossible
-    Enter what you want to convert (or exit):
-    &gt; exit
-  time: Mon, 04 Jan 2021 00:09:05 UTC
+  message: Congratulations!
+  time: Tue, 05 Jan 2021 11:34:52 UTC
 record: -1
